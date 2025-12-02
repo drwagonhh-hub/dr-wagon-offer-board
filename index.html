@@ -85,7 +85,7 @@
     </div>
   </div>
 
-  <script>
+    <script>
     /******************************************************************
      * CONFIGURATION
      * - 4 OFFERS (total ~25% chance)
@@ -140,6 +140,20 @@
     }
 
     function chooseIndex() {
+      // --- START: Added code for force parameter ---
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceId = urlParams.get('force');
+      if (forceId) {
+        const forcedIndex = ITEMS.findIndex(item => item.id === forceId);
+        if (forcedIndex !== -1) {
+          console.log(`Forcing item with ID: ${forceId}`); // For debugging
+          return forcedIndex;
+        } else {
+          console.warn(`Force ID '${forceId}' not found in ITEMS. Falling back to normal selection.`); // For debugging
+        }
+      }
+      // --- END: Added code for force parameter ---
+
       const saved = getSavedChoice();
       if (saved !== null && saved >= 0 && saved < ITEMS.length) return saved;
       const idx = weightedPick(ITEMS);
@@ -184,12 +198,3 @@
       }
     });
   </script>
-</body>
-</html>
-
-
-
-
-
-
-
