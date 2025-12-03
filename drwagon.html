@@ -78,32 +78,20 @@
   <script>
     /******************************************************************
      * CONFIGURATION
-     * - 4 OFFERS (total ~25% chance)
-     * - 7 MEMES (total ~75% chance)
+     * - OFFERS (total ~25% chance)
+     * - MEMES (total ~75% chance)
      ******************************************************************/
-    const ITEMS = [
-      // OFFERS
-      { id: 'offer-1', weight: 6, image: 'images/offer1.jpg', type: 'offer' },
-      { id: 'offer-2', weight: 6, image: 'images/offer2.jpg', type: 'offer' },
-      { id: 'offer-3', weight: 6, image: 'images/offer3.jpg', type: 'offer' },
-      { id: 'offer-4', weight: 6, image: 'images/offer4.jpg', type: 'offer' },
+    const ITEMS = [];
 
-      // MEMES
-      { id: 'meme-1', weight: 11, image: 'images/meme1.jpg', type: 'meme' },
-      { id: 'meme-2', weight: 11, image: 'images/meme2.jpg', type: 'meme' },
-      { id: 'meme-3', weight: 11, image: 'images/meme3.jpg', type: 'meme' },
-      { id: 'meme-4', weight: 11, image: 'images/meme4.jpg', type: 'meme' },
-      { id: 'meme-5', weight: 11, image: 'images/meme5.jpg', type: 'meme' },
-      { id: 'meme-6', weight: 11, image: 'images/meme6.jpg', type: 'meme' },
-      { id: 'meme-7', weight: 11, image: 'images/meme7.jpg', type: 'meme' },
-      { id: 'meme-8', weight: 11, image: 'images/meme8.jpg', type: 'meme' },
-      { id: 'meme-9', weight: 11, image: 'images/meme9.jpg', type: 'meme' },
-      { id: 'meme-10', weight: 11, image: 'images/meme10.jpg', type: 'meme' },
-      { id: 'meme-11', weight: 11, image: 'images/meme11.jpg', type: 'meme' },
-      { id: 'meme-12', weight: 11, image: 'images/meme12.jpg', type: 'meme' },
-      { id: 'meme-13', weight: 11, image: 'images/meme13.jpg', type: 'meme' },
-      { id: 'meme-14', weight: 11, image: 'images/meme14.jpg', type: 'meme' },
-    ];
+    // Generate OFFERS 1 to 10
+    for (let i = 1; i <= 10; i++) {
+      ITEMS.push({ id: `offer-${i}`, weight: 6, image: `images/offer${i}.jpg`, type: 'offer' });
+    }
+
+    // Generate MEMES 1 to 20
+    for (let i = 1; i <= 20; i++) {
+      ITEMS.push({ id: `meme-${i}`, weight: 11, image: `images/meme${i}.jpg`, type: 'meme' });
+    }
 
     const SAME_FOR_HOURS = 0; 
     const STORAGE_KEY = 'drw_choice_v1';
@@ -183,6 +171,3 @@
   </script>
 </body>
 </html>
-
-
-
