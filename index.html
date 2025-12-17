@@ -75,100 +75,133 @@
     </div>
   </div>
 
-  <script>
-    /******************************************************************
-     * CONFIGURATION
-     * - OFFERS (total ~25% chance)
-     * - MEMES (total ~75% chance)
-     ******************************************************************/
-    const ITEMS = [];
+ <script>
+  /******************************************************************
+   * CONFIGURATION
+   * - 4 OFFERS (total ~25% chance)
+   * - 7 MEMES (total ~75% chance)
+   ******************************************************************/
+  const ITEMS = [
+    // OFFERS
+    { id: 'offer-1', weight: 6, image: 'images/offer1.jpg', type: 'offer' },
+    { id: 'offer-2', weight: 6, image: 'images/offer2.jpg', type: 'offer' },
+    { id: 'offer-3', weight: 6, image: 'images/offer3.jpg', type: 'offer' },
+    { id: 'offer-4', weight: 6, image: 'images/offer4.jpg', type: 'offer' },
 
-    // Generate OFFERS 1 to 10
-    for (let i = 1; i <= 3; i++) {
-      ITEMS.push({ id: `offer-${i}`, weight: 6, image: `images/offer${i}.jpg`, type: 'offer' });
+    // MEMES
+    { id: 'meme-1', weight: 11, image: 'images/meme1.jpg', type: 'meme' },
+    { id: 'meme-2', weight: 11, image: 'images/meme2.jpg', type: 'meme' },
+    { id: 'meme-3', weight: 11, image: 'images/meme3.jpg', type: 'meme' },
+    { id: 'meme-4', weight: 11, image: 'images/meme4.jpg', type: 'meme' },
+    { id: 'meme-5', weight: 11, image: 'images/meme5.jpg', type: 'meme' },
+    { id: 'meme-6', weight: 11, image: 'images/meme6.jpg', type: 'meme' },
+    { id: 'meme-7', weight: 11, image: 'images/meme7.jpg', type: 'meme' },
+    { id: 'meme-8', weight: 11, image: 'images/meme8.jpg', type: 'meme' },
+    { id: 'meme-9', weight: 11, image: 'images/meme9.jpg', type: 'meme' },
+    { id: 'meme-10', weight: 11, image: 'images/meme10.jpg', type: 'meme' },
+    { id: 'meme-11', weight: 11, image: 'images/meme11.jpg', type: 'meme' },
+    { id: 'meme-12', weight: 11, image: 'images/meme12.jpg', type: 'meme' },
+    { id: 'meme-13', weight: 11, image: 'images/meme13.jpg', type: 'meme' },
+    { id: 'meme-14', weight: 11, image: 'images/meme14.jpg', type: 'meme' },
+  ];
+
+  const SAME_FOR_HOURS = 1; // IMPORTANT: Set this to 1 (or more) to enable choice saving
+  const STORAGE_KEY = 'drw_choice_v1';
+
+  function weightedPick(list) {
+    const total = list.reduce((s, it) => s + (it.weight || 1), 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < list.length; i++) {
+      r -= (list[i].weight || 1);
+      if (r <= 0) return i;
     }
+    return list.length - 1;
+  }
 
-    // Generate MEMES 1 to 20
-    for (let i = 1; i <= 14; i++) {
-      ITEMS.push({ id: `meme-${i}`, weight: 11, image: `images/meme${i}.jpg`, type: 'meme' });
-    }
+  function getSavedChoice() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || !obj.i || !obj.t) return null;
+      const age = (Date.now() - obj.t) / (1000 * 60 * 60);
+      if (age <= SAME_FOR_HOURS) return obj.i;
+      return null;
+    } catch (e) { return null; }
+  }
 
-    const SAME_FOR_HOURS = 0; 
-    const STORAGE_KEY = 'drw_choice_v1';
+  function saveChoice(index) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({i: index, t: Date.now()}));
+    } catch (e) {}
+  }
 
-    function weightedPick(list) {
-      const total = list.reduce((s, it) => s + (it.weight || 1), 0);
-      let r = Math.random() * total;
-      for (let i = 0; i < list.length; i++) {
-        r -= (list[i].weight || 1);
-        if (r <= 0) return i;
+  function chooseIndex() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceNewChoice = urlParams.get('force') === 'true';
+    const testIndex = urlParams.get('test'); // Get the value of the 'test' parameter
+
+    if (testIndex !== null && !isNaN(parseInt(testIndex))) {
+      // If 'test' parameter is present and a valid number, use it directly for testing
+      const index = parseInt(testIndex);
+      if (index >= 0 && index < ITEMS.length) {
+        console.log(`Displaying item at test index: ${index}`); // For debugging in console
+        return index;
       }
-      return list.length - 1;
     }
 
-    function getSavedChoice() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        const obj = JSON.parse(raw);
-        if (!obj || !obj.i || !obj.t) return null;
-        const age = (Date.now() - obj.t) / (1000 * 60 * 60);
-        if (age <= SAME_FOR_HOURS) return obj.i;
-        return null;
-      } catch (e) { return null; }
-    }
-
-    function saveChoice(index) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({i: index, t: Date.now()}));
-      } catch (e) {}
-    }
-
-    function chooseIndex() {
+    if (!forceNewChoice) {
       const saved = getSavedChoice();
-      if (saved !== null && saved >= 0 && saved < ITEMS.length) return saved;
-      const idx = weightedPick(ITEMS);
-      saveChoice(idx);
-      return idx;
-    }
-
-    const claimBtn = document.getElementById('claimBtn');
-    const modal = document.getElementById('modal');
-    const closeBtn = document.getElementById('closeBtn');
-    const displayImg = document.getElementById('displayImg');
-    const resultNote = document.getElementById('resultNote');
-
-    function openModalWithItem(index) {
-      const it = ITEMS[index] || {};
-      displayImg.src = it.image || 'images/placeholder.jpg';
-
-      if (it.type === 'offer') {
-        resultNote.textContent = "🎁 You got a lucky offer! Show this at the counter.";
-      } else {
-        resultNote.textContent = "😂 Enjoy this meme! Maybe you’ll get lucky next time.";
+      if (saved !== null && saved >= 0 && saved < ITEMS.length) {
+        console.log(`Displaying saved item at index: ${saved}`); // For debugging in console
+        return saved;
       }
-
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
     }
 
-    claimBtn.addEventListener('click', () => {
-      const idx = chooseIndex();
-      openModalWithItem(idx);
-    });
+    const idx = weightedPick(ITEMS);
+    saveChoice(idx);
+    console.log(`Displaying randomly chosen item at index: ${idx}`); // For debugging in console
+    return idx;
+  }
 
-    closeBtn.addEventListener('click', () => {
+  const claimBtn = document.getElementById('claimBtn');
+  const modal = document.getElementById('modal');
+  const closeBtn = document.getElementById('closeBtn');
+  const displayImg = document.getElementById('displayImg');
+  const resultNote = document.getElementById('resultNote');
+
+  function openModalWithItem(index) {
+    const it = ITEMS[index] || {};
+    displayImg.src = it.image || 'images/placeholder.jpg';
+
+    if (it.type === 'offer') {
+      resultNote.textContent = "🎁 You got a lucky offer! Show this at the counter.";
+    } else {
+      resultNote.textContent = "😂 Enjoy this meme! Maybe you’ll get lucky next time.";
+    }
+
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  claimBtn.addEventListener('click', () => {
+    const idx = chooseIndex();
+    openModalWithItem(idx);
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
       modal.classList.remove('show');
       modal.setAttribute('aria-hidden', 'true');
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-      }
-    });
-  </script>
+    }
+  });
+</script>
 </body>
 </html>
+
 
